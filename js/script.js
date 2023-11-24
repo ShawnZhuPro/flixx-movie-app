@@ -144,6 +144,8 @@ async function displayMovieDetails() {
       `;
 
   document.querySelector("#movie-details").appendChild(div);
+
+  fetchMovieTrailer(movieId);
 }
 
 // Display show details
@@ -339,6 +341,26 @@ function highlightActiveLink() {
 function addCommasToNumber(number) {
   // Regular expression
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+// Function to fetch and display movie trailer
+async function fetchMovieTrailer(movieId) {
+  const API_KEY = "5c4710e79ebd24278e9ed66fc6c66084"; // Replace with your TMDb API key
+
+  const response = await fetch(
+    `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${API_KEY}&language=en-US`
+  );
+  const data = await response.json();
+
+  if (data.results && data.results.length > 0) {
+    const trailerKey = data.results[0].key; // Assuming the first video is a trailer
+
+    // Embedding YouTube video into the trailer container
+    const trailerContainer = document.getElementById("trailer-container");
+    trailerContainer.innerHTML = `
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/${trailerKey}" frameborder="0" allowfullscreen></iframe>
+      `;
+  }
 }
 
 // Init App

@@ -24,12 +24,8 @@
         <div class="logo"><a href="/">FLIXX</a></div>
         <nav>
           <ul>
-            <li>
-              <a class="nav-link" href="/">Movies</a>
-            </li>
-            <li>
-              <a class="nav-link" href="/shows.html">TV Shows</a>
-            </li>
+            <li><a class="nav-link" href="/">Movies</a></li>
+            <li><a class="nav-link" href="/shows.html">TV Shows</a></li>
           </ul>
         </nav>
       </div>
@@ -65,8 +61,17 @@
             <button class="btn" type="submit">
               <i class="fas fa-search"></i>
             </button>
+            <!-- New genre filter button -->
+            <button class="btn filter-btn" onclick="toggleGenreFilter()">
+              Filter by Genre
+            </button>
           </div>
         </form>
+
+        <!-- Placeholder for genre filter options -->
+        <div class="genre-filter">
+          <!-- Genre options will be added here dynamically -->
+        </div>
       </div>
     </section>
 
@@ -95,5 +100,12 @@
     </footer>
 
     <div class="spinner"></div>
+
+    <script>
+      function toggleGenreFilter() {
+        const genreFilter = document.querySelector(".genre-filter");
+        genreFilter.classList.toggle("show");
+      }
+    </script>
   </body>
 </html>
