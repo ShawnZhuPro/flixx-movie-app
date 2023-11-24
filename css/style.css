@@ -326,6 +326,11 @@ section h2 {
   margin-top: 10px;
 }
 
+/* Genre Buttons */
+.genre-buttons {
+  margin-bottom: 100px;
+}
+
 /* Alert */
 .alert {
   padding: 10px 20px;

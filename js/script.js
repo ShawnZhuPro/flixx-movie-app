@@ -367,6 +367,39 @@ function displayPagination() {
   });
 }
 
+async function displayGenres() {
+  const genresData = await fetchAPIData("genre/movie/list");
+  const genres = genresData.genres;
+
+  const genreButtonsContainer = document.createElement("div");
+  genreButtonsContainer.classList.add("genre-buttons");
+
+  genres.forEach((genre) => {
+    const button = document.createElement("button");
+    button.classList.add("btn", "genre-btn");
+    button.setAttribute("data-genre-id", genre.id);
+    button.textContent = genre.name;
+
+    button.addEventListener("click", () => {
+      loadGenrePage(genre.id);
+    });
+
+    genreButtonsContainer.appendChild(button);
+  });
+
+  const targetElement = document.querySelector(".genre-filter .container");
+  targetElement.appendChild(genreButtonsContainer);
+}
+
+// *TODO: complete this function*
+function loadGenrePage(genreId) {
+  console.log("Loading genre page for ID:", genreId);
+  // Perform actions to load the genre page based on the selected genre ID
+  // For instance, you might want to fetch movies based on the genreId and display them
+  // You can make an API call here using the genreId to fetch movies of that genre
+  // Then update the UI to display the movies or perform any other actions accordingly
+}
+
 // Display movies in a slider
 async function displaySlider() {
   // Restructure results
@@ -516,6 +549,7 @@ function init() {
     case "/":
     case "/index.html":
       displaySlider();
+      displayGenres();
       displayPopularMovies();
       break;
     case "/shows.html":
