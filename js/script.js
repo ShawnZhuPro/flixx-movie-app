@@ -86,11 +86,12 @@ async function displayPopularShows() {
   });
 }
 
-// Display movie details
+// Fetches and displays detailed information about a specific movie
 async function displayMovieDetails() {
   // Gives us the movie ID through parsing the URL
   const movieId = window.location.search.split("=")[1];
 
+  // Fetches movie data and generates HTML for the movie details
   const movie = await fetchAPIData(`movie/${movieId}`);
 
   // Overlay for background image
@@ -98,6 +99,7 @@ async function displayMovieDetails() {
 
   const div = document.createElement("div");
 
+  // Generates HTML structure for movie details
   div.innerHTML = `
       <div class="details-top">
       <div>
@@ -157,15 +159,18 @@ async function displayMovieDetails() {
     </div>
       `;
 
+  // Appends to the 'movie-details' section
   document.querySelector("#movie-details").appendChild(div);
 
+  // Fetches and embeds the movie trailer
   fetchMovieTrailer(movieId);
 }
 
-// Display show details
+// Fetches and displays detailed information about a specific TV show
 async function displayShowDetails() {
   const showId = window.location.search.split("=")[1];
 
+  // Fetches TV show data
   const show = await fetchAPIData(`tv/${showId}`);
 
   // Overlay for background image
@@ -173,6 +178,7 @@ async function displayShowDetails() {
 
   const div = document.createElement("div");
 
+  // Generates HTML structure for TV show details
   div.innerHTML = `
       <div class="details-top">
       <div>
@@ -229,11 +235,13 @@ async function displayShowDetails() {
     </div>
       `;
 
+  // Appends to the 'show-details' section
   document.querySelector("#show-details").appendChild(div);
 }
 
 // Display backdrop on details pages
 function displayBackgroundImage(type, backgroundPath) {
+  // Creates a background image and appends it to the respective details section
   const overlayDiv = document.createElement("div");
   overlayDiv.style.backgroundImage = `url(https://image.tmdb.org/t/p/original/${backgroundPath})`;
   overlayDiv.style.backgroundSize = "cover";
@@ -254,16 +262,17 @@ function displayBackgroundImage(type, backgroundPath) {
   }
 }
 
-// Search Movies/Shows
+// Searches for Movies/Shows based on user input
 async function search() {
+  // Fetches search parameters from URL
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
 
   global.search.type = urlParams.get("type");
   global.search.term = urlParams.get("search-term");
 
+  // Makes API request based on search criteria and displays search results if user inputted text
   if (global.search.term !== "" && global.search.term !== null) {
-    // Make request and display results
     const { results, total_pages, page, total_results } = await searchAPIData();
 
     global.search.page = page;
@@ -283,12 +292,14 @@ async function search() {
   }
 }
 
+// Displays search results and handles pagination
 function displaySearchResults(results) {
   // Clear previous results
   document.querySelector("#search-results").innerHTML = "";
   document.querySelector("#search-results-heading").innerHTML = "";
   document.querySelector("#pagination").innerHTML = "";
 
+  // Generates HTML structure for search results and displays them
   results.forEach((result) => {
     const div = document.createElement("div");
     div.classList.add("card");
@@ -332,6 +343,7 @@ function displaySearchResults(results) {
     document.querySelector("#search-results").appendChild(div);
   });
 
+  // Handles pagination and displays page navigation buttons
   displayPagination();
 }
 
@@ -372,13 +384,16 @@ function displayPagination() {
   });
 }
 
+// Fetches genres and displays genre buttons
 async function displayGenres() {
+  // Fetches genre data from API and generates buttons for each genre
   const genresData = await fetchAPIData("genre/movie/list");
   const genres = genresData.genres;
 
   const genreButtonsContainer = document.createElement("div");
   genreButtonsContainer.classList.add("genre-buttons");
 
+  // Adds event listeners to genre buttons for filtering movies by genre
   genres.forEach((genre) => {
     const button = document.createElement("button");
     button.classList.add("btn", "genre-btn");
@@ -396,17 +411,15 @@ async function displayGenres() {
   targetElement.appendChild(genreButtonsContainer);
 }
 
+// Loads movies of a selected genre and updates display
 async function loadGenrePage(genreId, genreName) {
-  const apiKey = global.API_KEY;
-  const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=${genreId}`;
-
-  const response = await fetch(url);
-  const moviesData = await response.json();
-  const movies = moviesData.results;
+  // Destructures results from fetchGenreAPIData to movies variable
+  const { results: movies } = await fetchGenreAPIData(genreId);
 
   const moviesContainer = document.querySelector("#popular-movies");
   moviesContainer.innerHTML = ""; // Clear previous content
 
+  // Updates display
   movies.forEach((movie) => {
     const div = document.createElement("div");
     div.classList.add("card");
@@ -471,6 +484,7 @@ async function displaySlider() {
   });
 }
 
+// Initializes the Swiper slider for displaying movies
 function initSwiper() {
   const swiper = new Swiper(".swiper", {
     slidesPerView: 1,
@@ -517,6 +531,7 @@ async function fetchAPIData(endpoint) {
 
   hideSpinner();
 
+  // Returns the fetched data as JSON
   return data;
 }
 
@@ -532,13 +547,31 @@ async function searchAPIData() {
 
   hideSpinner();
 
+  // Returns search results along with pagination details
   return data;
 }
 
+// Make request to fetch API data for genres
+async function fetchGenreAPIData(genreId) {
+  showSpinner();
+
+  const response = await fetch(
+    `${global.API_URL}discover/movie?api_key=${global.API_KEY}&with_genres=${genreId}`
+  );
+
+  const data = await response.json();
+
+  hideSpinner();
+
+  return data;
+}
+
+// Shows loading spinner animation
 function showSpinner() {
   document.querySelector(".spinner").classList.add("show");
 }
 
+// Hides loading spinner animation
 function hideSpinner() {
   document.querySelector(".spinner").classList.remove("show");
 }
@@ -571,14 +604,14 @@ async function fetchMovieTrailer(movieId) {
   }
 }
 
-// Show Alert
+// Alert message for empty user searches
 function showAlert(message, className = "error") {
-  const alertEl = document.createElement("div");
-  alertEl.classList.add("alert", className);
-  alertEl.appendChild(document.createTextNode(message));
-  document.querySelector("#alert").appendChild(alertEl);
+  const alertElement = document.createElement("div");
+  alertElement.classList.add("alert", className);
+  alertElement.appendChild(document.createTextNode(message));
+  document.querySelector("#alert").appendChild(alertElement);
 
-  setTimeout(() => alertEl.remove(), 3000);
+  setTimeout(() => alertElement.remove(), 3000);
 }
 
 function addCommasToNumber(number) {
@@ -612,4 +645,5 @@ function init() {
   highlightActiveLink();
 }
 
+// Initializes web page when DOM is loaded
 document.addEventListener("DOMContentLoaded", init);
