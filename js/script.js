@@ -1,3 +1,4 @@
+// Global variables for storing current page, search details, and API keys
 const global = {
   currentPage: window.location.pathname,
   search: {
@@ -11,8 +12,9 @@ const global = {
   API_URL: "https://api.themoviedb.org/3/",
 };
 
-// Displays 20 most popular movies
+// Fetches and displays the 20 most popular movies
 async function displayPopularMovies() {
+  // Fetches movie data and generates HTML for each movie card
   const { results } = await fetchAPIData("movie/popular");
 
   results.forEach((movie) => {
@@ -42,12 +44,14 @@ async function displayPopularMovies() {
           </div>
         `;
 
+    // Appends each movie card to the 'popular-movies' section
     document.querySelector("#popular-movies").appendChild(div);
   });
 }
 
-// Display 20 most popular TV shows
+// Fetches and displays the 20 most popular TV shows
 async function displayPopularShows() {
+  // Fetches TV show data and generates HTML for each show card
   const { results } = await fetchAPIData("tv/popular");
 
   results.forEach((show) => {
@@ -77,6 +81,7 @@ async function displayPopularShows() {
         </div>
       `;
 
+    // Appends each show card to the 'popular-shows' section
     document.querySelector("#popular-shows").appendChild(div);
   });
 }
@@ -352,7 +357,7 @@ function displayPagination() {
     document.querySelector("#next").disabled = true;
   }
 
-  // Next page *IMPORTANT*
+  // Next page
   document.querySelector("#next").addEventListener("click", async () => {
     global.search.page++;
     const { results, total_pages } = await searchAPIData();
@@ -381,7 +386,7 @@ async function displayGenres() {
     button.textContent = genre.name;
 
     button.addEventListener("click", () => {
-      loadGenrePage(genre.id);
+      loadGenrePage(genre.id, genre.name);
     });
 
     genreButtonsContainer.appendChild(button);
@@ -391,13 +396,51 @@ async function displayGenres() {
   targetElement.appendChild(genreButtonsContainer);
 }
 
-// *TODO: complete this function*
-function loadGenrePage(genreId) {
-  console.log("Loading genre page for ID:", genreId);
-  // Perform actions to load the genre page based on the selected genre ID
-  // For instance, you might want to fetch movies based on the genreId and display them
-  // You can make an API call here using the genreId to fetch movies of that genre
-  // Then update the UI to display the movies or perform any other actions accordingly
+async function loadGenrePage(genreId, genreName) {
+  const apiKey = global.API_KEY;
+  const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=${genreId}`;
+
+  const response = await fetch(url);
+  const moviesData = await response.json();
+  const movies = moviesData.results;
+
+  const moviesContainer = document.querySelector("#popular-movies");
+  moviesContainer.innerHTML = ""; // Clear previous content
+
+  movies.forEach((movie) => {
+    const div = document.createElement("div");
+    div.classList.add("card");
+    div.innerHTML = `
+          <a href="movie-details.html?id=${movie.id}">
+            ${
+              movie.poster_path
+                ? `
+              <img src="https://image.tmdb.org/t/p/w500/${movie.poster_path}"
+              class="card-img-top"
+              alt="${movie.title}" />
+            `
+                : `
+              <img src="../images/no-image.jpg"
+              class="card-img-top"
+              alt="${movie.title}" />
+            `
+            }
+          </a>
+          <div class="card-body">
+            <h5 class="card-title">${movie.title}</h5>
+            <p class="card-text">
+              <small class="text-muted">Release Date: ${
+                movie.release_date
+              }</small>
+            </p>
+          </div>
+        `;
+    moviesContainer.appendChild(div);
+  });
+
+  // Update heading for the genre movies
+  const genreHeading = document.querySelector(".genre-filter h3");
+  genreHeading.textContent = `Selected Genre: ${genreName}`;
 }
 
 // Display movies in a slider
